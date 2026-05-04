@@ -398,9 +398,174 @@ considered a scientific model~\cite{cornellPlagueInc2014}.
 \section{\SectionTitleProblemSolution}
 \label{sec:solution}
 
-% the following content of the section should be removed from the final version of the raport.
+The research problem addressed in this project is the simulation of
+disease spread in a heterogeneous population. The goal is not only to
+reproduce the general shape of an epidemic curve, but also to represent
+how local contacts, individual behavior, vaccination, hospitals, and
+quarantine-like restrictions influence the dynamics of the epidemic. In
+contrast to purely compartmental models, where the population is
+described only by aggregate variables, the proposed solution uses an
+agent-based model. Each person is represented as an individual agent with
+its own state, age, position, vaccination status, and movement behavior.
+This makes it possible to observe epidemic dynamics that emerge from
+local interactions rather than being directly imposed by differential
+equations.
 
-\emph{Research problem formulation. Proposal of the solution: detailed description of the algorithms/system/framework.}
+The model follows the SEIRD structure. Each citizen belongs to one of
+five epidemiological states: susceptible ($S$), exposed ($E$), infected
+($I$), recovered ($R$), or deceased ($D$). Susceptible agents may become
+exposed after contact with infected neighbors. Exposed agents represent
+individuals in the incubation period; after a fixed number of simulation
+steps they become infected. Infected agents may recover, die, or move
+toward a hospital if one is nearby. Recovered agents may either keep
+permanent immunity or lose immunity after a configured number of steps.
+Deceased agents are removed from the spatial grid and no longer
+participate in the simulation.
+
+The simulation is implemented in Python using the Mesa framework for
+agent-based modeling. Mesa provides the basic abstractions for agents,
+models, and spatial environments. The population is placed on a
+two-dimensional \texttt{MultiGrid}, where multiple agents may occupy the
+same cell. The global configuration is stored in dataclasses, which makes
+the parameters of the experiment explicit and easy to change. The most
+important configurable parameters are the population size, grid
+dimensions, infection probability, recovery probability, incubation
+period, mortality parameters, hospital capacity, vaccination
+effectiveness, avoidance behavior, immunity duration, quarantine
+threshold, and number of simulation steps.
+
+\subsection{Model Initialization}
+\label{sec:solution-initialization}
+
+At the beginning of the simulation, the model creates three types of
+objects: citizens, hospitals, and vaccination points. Hospitals and
+vaccination points are placed at fixed positions defined in the
+configuration. Citizens are generated with randomly sampled ages based on
+predefined age brackets and their corresponding probabilities. A
+configured number of citizens is initially assigned to the infected
+state, while the rest start as susceptible. A selected fraction of the
+population is marked as ``avoiders'', meaning that these agents try to
+avoid cells occupied by visibly infected individuals.
+
+The model uses a random seed to make simulation runs reproducible. This
+is important because infection, recovery, death, movement, and age
+sampling all contain stochastic elements. With the same seed and the same
+configuration, the same simulation trajectory can be recreated.
+
+\subsection{Agent Behavior and Movement}
+\label{sec:solution-agent-behavior}
+
+During each simulation step, all agents are activated in random order.
+This random activation avoids a fixed update order and better reflects
+the stochastic nature of the modeled process. Citizen agents first decide
+whether and where to move, and then update their epidemiological state.
+
+Movement is local and takes place on the grid neighborhood of the
+agent's current position. Younger agents move normally, while agents
+above a configured age threshold have a lower probability of moving in a
+given step. This represents reduced mobility among older individuals.
+Avoider agents inspect neighboring cells and prefer destinations without
+infected citizens and outside quarantine zones. If no safe cell is
+available, they fall back to the available neighboring cells. Infected
+agents behave differently: if a hospital is within a configured search
+radius, they move toward the nearest hospital and prefer cells that bring
+them closer to it.
+
+\subsection{Infection Algorithm}
+\label{sec:solution-infection}
+
+The infection process is based on local contacts. For each susceptible
+citizen, the model checks neighboring cells and counts the number of
+infected citizens in the neighborhood. Let $k$ denote the number of
+infected neighbors and let $\beta$ denote the base transmission
+probability per infected contact. The probability that the susceptible
+agent becomes exposed in a given step is computed as:
+
+\begin{equation}
+P(\mathrm{infection}) = 1 - (1 - \beta)^k.
+\end{equation}
+
+This formula assumes that each infected neighbor creates an independent
+chance of transmission. If there are no infected neighbors, the infection
+probability is zero. If the agent is vaccinated, the effective
+transmission probability is reduced according to the vaccination
+effectiveness parameter:
+
+\begin{equation}
+\beta_{\mathrm{vaccinated}} = \beta \cdot (1 - e_v),
+\end{equation}
+
+where $e_v$ is the configured vaccination effectiveness. This means that
+vaccination does not create complete immunity by default, but decreases
+the probability of infection during contact with infected agents.
+
+\subsection{Disease Progression}
+\label{sec:solution-disease-progression}
+
+Disease progression is modeled as a finite-state process. When a
+susceptible citizen becomes infected, the agent first enters the exposed
+state. The exposed state lasts for a fixed incubation period measured in
+simulation steps. After the incubation timer reaches zero, the agent
+becomes infected and can start spreading the disease to others.
+
+In each step, an infected agent may recover with probability $\gamma$.
+This base recovery probability can be increased by a hospital recovery
+bonus if the agent is inside the area of a hospital that still has
+available capacity. If recovery does not occur, the model checks whether
+the agent dies. Mortality is age-dependent: all infected agents have a
+base mortality probability, and an additional age-related penalty is
+added for agents above the configured age threshold. This makes older
+agents more vulnerable, which improves the realism of the population
+model.
+
+Recovered agents receive immunity. If the configured immunity duration is
+zero, immunity is treated as permanent. Otherwise, the immunity timer is
+decreased in each step and the agent eventually returns to the
+susceptible state. This allows the model to represent both permanent and
+temporary immunity scenarios.
+
+\subsection{Environmental Objects and Interventions}
+\label{sec:solution-interventions}
+
+Hospitals and vaccination points are modeled as fixed environmental
+agents. A hospital has a position, area radius, capacity, and recovery
+bonus. During each step, it counts infected citizens within its area. If
+the number of patients does not exceed the capacity, infected citizens in
+the hospital area receive an increased chance of recovery. Once the
+hospital reaches capacity, the recovery bonus is no longer applied.
+
+Vaccination points also have fixed positions. When a susceptible citizen
+enters a cell containing a vaccination point, the citizen becomes
+vaccinated. This vaccination status then reduces the effective infection
+probability in future contacts. In this model, vaccination is represented
+as a preventive mechanism rather than a treatment for already infected
+agents.
+
+The model also includes a simple quarantine mechanism. If the number of
+infected citizens exceeds a configured threshold, quarantine zones are
+created around positions occupied by infected agents. These zones
+restrict the movement choices of healthy avoider agents and random-moving
+agents. The mechanism is intentionally simple, but it introduces a global
+response to the epidemic and allows the simulation to represent limited
+mobility under epidemic pressure.
+
+\subsection{Data Collection and Visualization}
+\label{sec:solution-data-visualization}
+
+The model uses Mesa's \texttt{DataCollector} to record the number of
+agents in each epidemiological state at every simulation step. The
+collected variables are susceptible, exposed, infected, recovered,
+deceased, vaccinated, and the number of active quarantine zones. After
+the simulation ends, the collected data are converted to a pandas
+\texttt{DataFrame}. The epidemic curve is then visualized using
+Matplotlib by plotting the SEIRD state counts over time.
+
+The simulation can stop before reaching the maximum number of steps if no
+infected or exposed agents remain. In that case, the epidemic is treated
+as finished. Otherwise, the model runs until the configured number of
+steps is reached. The resulting plots provide a direct way to analyze how
+the number of susceptible, exposed, infected, recovered, and deceased
+agents changes during the simulated epidemic.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\SectionTitleExperiments}
