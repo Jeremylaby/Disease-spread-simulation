@@ -426,13 +426,26 @@ The simulation is implemented in Python using the Mesa framework for
 agent-based modeling. Mesa provides the basic abstractions for agents,
 models, and spatial environments. The population is placed on a
 two-dimensional \texttt{MultiGrid}, where multiple agents may occupy the
-same cell. The global configuration is stored in dataclasses, which makes
-the parameters of the experiment explicit and easy to change. The most
-important configurable parameters are the population size, grid
-dimensions, infection probability, recovery probability, incubation
-period, mortality parameters, hospital capacity, vaccination
-effectiveness, avoidance behavior, immunity duration, quarantine
-threshold, and number of simulation steps.
+same cell. The project uses Python dataclasses to keep the global
+configuration explicit and easy to modify, pandas to store collected
+simulation results, and Matplotlib to visualize both the final epidemic
+curve and the live spatial state of the simulation. The most important
+configurable parameters are the population size, grid dimensions,
+infection probability, recovery probability, incubation period, mortality
+parameters, hospital capacity, vaccination effectiveness, avoidance
+behavior, immunity duration, quarantine threshold, and number of
+simulation steps.
+
+The system provides two execution modes. The standard script,
+\texttt{run.py}, runs the model for a configured number of steps and then
+plots the aggregated SEIRD curves. The interactive script,
+\texttt{run\_live.py}, displays the grid during the simulation. It shows
+citizens as colored points according to their current epidemiological
+state, marks hospitals and vaccination points with separate symbols, and
+adds a legend with the current state counts. The live mode accepts a
+command-line argument expressed in hundredths of a second; for example,
+\texttt{python run\_live.py 50} updates the displayed frame every half
+second.
 
 \subsection{Model Initialization}
 \label{sec:solution-initialization}
@@ -549,6 +562,32 @@ agents. The mechanism is intentionally simple, but it introduces a global
 response to the epidemic and allows the simulation to represent limited
 mobility under epidemic pressure.
 
+\subsection{Live Spatial Visualization}
+\label{sec:solution-live-visualization}
+
+In addition to the final epidemic curve, the project includes a live
+visualization of the spatial simulation. This view is implemented in
+\texttt{run\_live.py} using Matplotlib's interactive plotting mode. Each
+frame renders the current grid state: susceptible, exposed, infected,
+recovered, and deceased citizens are represented with different colors.
+Vaccinated citizens are additionally marked with an outline, so the
+effect of vaccination points can be observed directly on the grid.
+Hospitals are drawn with a distinct marker and a visible radius of
+influence, while vaccination points are displayed with their own marker.
+The side panel contains a legend and live counters for all SEIRD states,
+the number of vaccinated citizens, and the number of active quarantine
+zones.
+
+The live visualization is based on snapshots of the model state. A
+snapshot stores the current step number, agent positions, epidemiological
+states, vaccination flags, hospital occupancy, vaccination point
+statistics, and quarantine zones. The graphical interface displays the
+snapshot for step $n$, while the next step, $n+1$, is computed in the
+background by a single-worker \texttt{ThreadPoolExecutor}. This separates
+simulation computation from frame rendering and reduces visible pauses in
+the animation. When the configured delay passes, the already computed
+snapshot is displayed as the next frame.
+
 \subsection{Data Collection and Visualization}
 \label{sec:solution-data-visualization}
 
@@ -557,8 +596,11 @@ agents in each epidemiological state at every simulation step. The
 collected variables are susceptible, exposed, infected, recovered,
 deceased, vaccinated, and the number of active quarantine zones. After
 the simulation ends, the collected data are converted to a pandas
-\texttt{DataFrame}. The epidemic curve is then visualized using
-Matplotlib by plotting the SEIRD state counts over time.
+\texttt{DataFrame}. In the standard execution mode, the epidemic curve is
+visualized using Matplotlib by plotting the SEIRD state counts over time.
+In the live execution mode, the same underlying model is advanced step by
+step, but the current spatial state is rendered continuously before the
+final aggregate plot is needed.
 
 The simulation can stop before reaching the maximum number of steps if no
 infected or exposed agents remain. In that case, the epidemic is treated
