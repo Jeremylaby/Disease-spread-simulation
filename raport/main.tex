@@ -527,12 +527,25 @@ becomes infected and can start spreading the disease to others.
 In each step, an infected agent may recover with probability $\gamma$.
 This base recovery probability can be increased by a hospital recovery
 bonus if the agent is inside the area of a hospital that still has
-available capacity. If recovery does not occur, the model checks whether
-the agent dies. Mortality is age-dependent: all infected agents have a
-base mortality probability, and an additional age-related penalty is
-added for agents above the configured age threshold. This makes older
-agents more vulnerable, which improves the realism of the population
-model.
+available capacity. The effective recovery probability is therefore:
+
+\begin{equation}
+\gamma_{\mathrm{effective}} =
+\begin{cases}
+\gamma + b_h, & \text{if the agent is inside a non-full hospital area,}\\
+\gamma, & \text{otherwise,}
+\end{cases}
+\end{equation}
+
+where $b_h$ is the configured hospital recovery bonus. For the default
+configuration, $\gamma = 0.05$ and $b_h = 0.05$, so an infected agent in
+range of a hospital with available capacity has a recovery probability
+of $0.10$ in a simulation step instead of $0.05$. If recovery does not
+occur, the model checks whether the agent dies. Mortality is
+age-dependent: all infected agents have a base mortality probability,
+and an additional age-related penalty is added for agents above the
+configured age threshold. This makes older agents more vulnerable, which
+improves the realism of the population model.
 
 Recovered agents receive immunity. If the configured immunity duration is
 zero, immunity is treated as permanent. Otherwise, the immunity timer is
@@ -553,7 +566,9 @@ hospital reaches capacity, the recovery bonus is no longer applied.
 Vaccination points also have fixed positions. When a susceptible citizen
 enters a cell containing a vaccination point, the citizen becomes
 vaccinated. This vaccination status then reduces the effective infection
-probability in future contacts. In this model, vaccination is represented
+probability in future contacts according to
+$\beta_{\mathrm{vaccinated}} = \beta \cdot (1 - e_v)$, where $e_v$ is
+the vaccination effectiveness. In this model, vaccination is represented
 as a preventive mechanism rather than a treatment for already infected
 agents.
 
