@@ -1,0 +1,671 @@
+%%%%%% -*- Coding: utf-8-unix; Mode: latex
+
+%\documentclass[polish]{projectreport}
+\documentclass[english]{projectreport}
+
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{subfigure}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{grffile}
+
+\usepackage[bookmarks=false]{hyperref}
+\hypersetup{colorlinks,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue}
+
+\usepackage{indentfirst}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage[ruled,linesnumbered,lined]{algorithm2e}
+\usepackage[svgnames]{xcolor}
+\usepackage{inconsolata}
+\usepackage{fancyhdr}
+
+\usepackage{csquotes}
+\DeclareQuoteStyle[quotes]{polish}
+  {\quotedblbase}
+  {\textquotedblright}
+  [0.05em]
+  {\quotesinglbase}
+  {\fixligatures\textquoteright}
+\DeclareQuoteAlias[quotes]{polish}{polish}
+
+\usepackage[
+style=numeric,
+sorting=nyt,
+isbn=false,
+doi=true,
+url=true,
+backref=false,
+backrefstyle=none,
+maxnames=10,
+giveninits=true,
+abbreviate=true,
+defernumbers=false,
+backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
+\lstset{
+    %language=Python, %% PHP, C, Java, etc.
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{gray!5},
+    commentstyle=\it\color{Green},
+    keywordstyle=\color{Red},
+    stringstyle=\color{Blue},
+    numberstyle=\tiny\color{Black},
+    % morekeywords={TestKeyword},
+    % mathescape=true,
+    escapeinside=`',
+    frame=single, %shadowbox,
+    tabsize=2,
+    rulecolor=\color{black!30},
+    title=\lstname,
+    breaklines=true,
+    breakatwhitespace=true,
+    framextopmargin=2pt,
+    framexbottommargin=2pt,
+    extendedchars=false,
+    captionpos=b,
+    abovecaptionskip=5pt,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\SetAlgorithmName{\LangAlgorithm}{\LangAlgorithmRef}{\LangListOfAlgorithms}
+
+\renewcommand{\lstlistingname}{\LangListing}
+\renewcommand\lstlistlistingname{\LangListOfListings}
+
+\newcolumntype{Y}{>{\small\centering\arraybackslash}X}
+%\newcolumntype{b}{>{\hsize=1.6\hsize}Y}
+%\newcolumntype{m}{>{\hsize=.6\hsize}Y}
+%\newcolumntype{s}{>{\hsize=.4\hsize}Y}
+
+\captionsetup[figure]{skip=5pt,position=bottom}
+\captionsetup[table]{skip=5pt,position=top}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{Piotr Błaszczyk$^1$ \and Stanisław Barycki$^2$}
+\title{Simulation of Disease Spread in a Population}
+
+\date{
+	{\small
+	$^1$AGH University of Krakow \\ \texttt{blaszczykp@student.agh.edu.pl}\\[1ex]%
+	$^2$AGH University of Krakow \\ \texttt{barycki@student.agh.edu.pl}\\[2ex]%
+	\the\year}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\maketitle
+
+\thispagestyle{empty}
+
+\begin{abstract}
+\noindent Abstract of the paper
+
+\noindent\textbf{Keywords:} disease spread, pandemic, simulation
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\SectionTitleIntroduction}
+\label{sec:introduction}
+
+Modeling and simulation of disease spread in populations is an important research area, especially in the context of public health and epidemic control. Various approaches have been proposed in the literature, including classical compartmental models such as SIR and SEIR~\cite{kermack1927sir, hethcote2000mathematics}, stochastic models~\cite{allen2017primer}, and more advanced approaches such as agent-based simulations that aim to capture individual behavior and interactions.
+
+One of the key challenges in this domain is the trade-off between model simplicity and realism. While simple models are computationally efficient and provide useful analytical insights, they often rely on strong assumptions that do not fully reflect real-world conditions. In particular, they typically assume homogeneous mixing of the population and limited variability in individual behavior, which can lead to discrepancies between simulated and real epidemic dynamics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Citations}
+\label{sec:citations}
+
+Classical approaches to epidemic modeling are based on compartmental models, such as the SIR model introduced by Kermack and McKendrick~\cite{kermack1927sir}, and its extensions, including the SEIR model discussed in~\cite{hethcote2000mathematics}. These models provide a theoretical foundation for analyzing the dynamics of infectious diseases.
+
+More advanced approaches include stochastic models, which incorporate randomness into the simulation of infection and recovery processes~\cite{allen2017primer}, and agent-based models, which explicitly represent individuals and their interactions, allowing for the inclusion of heterogeneous behavior and contact structures~\cite{cdc2025transmission}.
+
+In addition to traditional mathematical models, researchers have also explored alternative approaches to understanding epidemic dynamics through virtual environments. An interesting example is the analysis of the "Corrupted Blood" incident in an online game~\cite{lofgren2007virtual}. In this case, a bug led to the uncontrolled spread of a disease-like effect among players, resembling real-world epidemic behavior.
+
+Studies such as~\cite{lofgren2007virtual} suggest that virtual environments can provide valuable insights into the spread of infectious diseases and human behavioral responses. Similar ideas appear in designed simulation environments such as the game Plague Inc., which incorporates epidemiological concepts such as the basic reproduction number and global transmission networks~\cite{cornellPlagueInc2014, gideonR02024}. At the same time, these approaches highlight important limitations, particularly related to unrealistic behavior and the lack of real-world consequences, which may significantly affect the dynamics of the system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lists}
+\label{sec:lists}
+
+Several approaches to modeling the spread of diseases in populations can be distinguished:
+
+\begin{itemize}
+\item \textbf{Compartmental models} (e.g., SIR, SEIR), which divide the population into groups and describe transitions between them using mathematical equations. These models form the theoretical foundation of epidemic modeling.
+
+\item \textbf{Stochastic models}, which introduce randomness into the
+  simulation by treating infections and recoveries as probabilistic
+  events, producing different epidemic trajectories on each run.
+
+\item \textbf{Agent-based models}, where each individual is simulated separately, allowing for a more realistic representation of interactions, heterogeneity, and behavioral factors.
+
+\item \textbf{Virtual environment simulations}, such as the "Corrupted Blood" incident in online games, which provide insight into emergent behavior and the role of human decisions in epidemic dynamics.
+\end{itemize}
+
+These approaches differ in terms of complexity, realism, and computational cost. In particular, studies based on virtual environments indicate that human behavior can significantly influence the dynamics of disease spread, which is often not fully captured by classical models.
+
+In the following section, selected modeling approaches are discussed in more detail, including classical compartmental models (SIR and SEIR) as well as observations derived from virtual epidemic scenarios.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modeling Approaches}
+\label{sec:modeling-approaches}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{SIR Model}
+\label{sec:sir}
+
+The SIR model, introduced by Kermack and McKendrick~\cite{kermack1927sir}, is one of the most fundamental approaches to modeling the spread of infectious diseases. It divides the population into three compartments: susceptible (S), infected (I), and recovered (R).
+
+The model describes the transitions between these groups over time. Susceptible individuals become infected through contact with infected individuals, and infected individuals eventually recover (or are removed from the system). The dynamics of the model are governed by two main parameters: the infection rate and the recovery rate.
+
+A key insight of the SIR model is that an epidemic does not continue indefinitely. As the number of susceptible individuals decreases, the disease gradually loses its ability to spread, leading to a decline in the number of infected individuals. This explains why epidemics often peak and then subside even without infecting the entire population.
+
+From the modeling perspective, the SIR model is simple and computationally efficient, making it a useful baseline for simulations. However, it assumes homogeneous mixing of the population and does not account for individual behavior or contact structure, which limits its realism in more complex scenarios.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{SEIR Model}
+\label{sec:seir}
+
+The SEIR model is an extension of the classical SIR framework and is discussed in the broader review of infectious disease models by Hethcote~\cite{hethcote2000mathematics}. In this model, the population is divided into four compartments: susceptible (S), exposed (E), infected (I), and recovered (R).
+
+The key difference between the SIR and SEIR models is the introduction of the exposed class. This compartment contains individuals who have already been infected but are not yet infectious. Such a formulation makes the model more appropriate for diseases with a non-negligible latent or incubation period.
+
+From the perspective of modeling and simulation, the SEIR model provides a more realistic description of epidemic dynamics than the basic SIR model. In particular, it allows the simulation to represent the delay between infection and infectiousness, which may significantly affect the timing and shape of the epidemic peak.
+
+At the same time, the SEIR model remains relatively simple and computationally tractable. However, similarly to the SIR model, it still relies on simplifying assumptions such as homogeneous mixing of the population and limited representation of individual behavior.
+
+\subsubsection{Other Compartmental Model Variants}
+\label{sec:variants}
+
+The SIR and SEIR models serve as a foundation for a number of variants
+that introduce additional compartments to capture specific aspects of
+disease dynamics~\cite{hethcote2000mathematics}. The most common
+extensions include:
+
+\begin{itemize}
+\item \textbf{SIS} -- removes the recovered class; individuals return to
+  the susceptible state after infection, modeling diseases where
+  reinfection is possible (e.g.\ sexually transmitted infections),
+\item \textbf{SIRD} -- splits the recovered class into recovered and
+  deceased, allowing the model to track mortality separately,
+\item \textbf{MSIR} -- adds a maternally immune class at birth,
+  representing temporary immunity inherited from the mother,
+\item \textbf{SIR-V / SEIR-V} -- adds a vaccinated class, enabling the
+  evaluation of vaccination campaign effects on epidemic spread.
+\end{itemize}
+
+\noindent
+All of these variants follow the same principle of transitions between
+compartments, differing only in the number and type of groups considered.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Stochastic Approach to Epidemic Modeling}
+\label{sec:stochastic}
+
+The SIR and SEIR models described above are deterministic -- given the
+same parameters and initial conditions, they always produce the same
+epidemic curve. In each time step of fixed length, the model computes new
+values of $S$, $I$, and $R$ using differential equations, which may
+result in fractional numbers of individuals (e.g.\ 3.7~infected persons).
+While this is mathematically convenient, it does not reflect reality:
+a~person either becomes infected or does not, and these events do not
+occur at regular intervals.
+
+Stochastic epidemic models address this by simulating individual events
+rather than computing continuous changes. One of the most widely used methods for this purpose is the Gillespie algorithm, originally developed for chemical kinetics~\cite{gillespie1977exact} and later widely adopted in computational epidemiology~\cite{allen2017primer}.
+
+First, the time until the next event is drawn from an exponential
+distribution:
+\begin{equation}
+  \tau = \frac{-\ln(r_1)}{a_{\text{total}}}\,,
+  \label{eq:tau}
+\end{equation}
+where $r_1$ is a random number from the interval $(0,1)$ and
+$a_{\text{total}}$ is the total rate of all possible events, defined as:
+\begin{equation}
+  a_{\text{total}} = \frac{\beta\, S\, I}{N} + \gamma\, I\,.
+  \label{eq:a-total}
+\end{equation}
+Here $\beta$ is the infection rate, representing how quickly the disease
+spreads through contact between susceptible and infected individuals,
+and $\gamma$ is the recovery rate, representing how quickly infected
+individuals recover. A~higher value of~$\beta$ (more contagious disease)
+or a~lower value of~$\gamma$ (longer recovery time) both increase
+$a_{\text{total}}$, which in turn decreases~$\tau$ -- meaning that
+events occur more frequently and the epidemic progresses faster.
+
+Second, the algorithm determines whether the event is an infection or
+a~recovery. Another random number~$r_2$ is drawn from $(0,1)$ and
+compared with a threshold:
+\begin{equation}
+  \text{event} =
+  \begin{cases}
+    \text{infection}  & \text{if } r_2 < \dfrac{\beta\, S\, I / N}
+                        {a_{\text{total}}}\,,\\[6pt]
+    \text{recovery}   & \text{otherwise.}
+  \end{cases}
+  \label{eq:event-selection}
+\end{equation}
+In each step, exactly one individual changes state: either one person
+moves from~$S$ to~$I$, or one person moves from~$I$ to~$R$. The
+simulation clock advances by~$\tau$, and the procedure repeats until no
+infected individuals remain.
+
+Because of the random draws, each run of the simulation produces
+a~different epidemic trajectory. This is particularly important for small
+populations or the early stages of an outbreak, where a single random
+event -- such as the first infected person recovering before infecting
+anyone else -- can determine whether an epidemic occurs at
+all~\cite{allen2017primer}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Place after the Stochastic Approach section (sec:stochastic),
+% before \section{\SectionTitleProblemSolution}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Agent-Based Models}
+\label{sec:abm}
+
+Agent-based models (ABMs) build upon and extend the network-based
+approach to epidemic modeling. In contrast to compartmental models, where
+every individual has an equal chance of contact with every other
+individual, ABMs represent the population as a network of connections --
+each person can only interact with a limited set of neighbors, such as
+family members, coworkers, or people in close physical proximity. A
+susceptible individual with $k_i$ infected neighbors has a probability of
+becoming infected.
+
+
+
+In an agent-based system, each node in this network becomes an autonomous
+\emph{agent} representing a single individual. An agent carries its own
+internal state -- health status (susceptible, infected, or recovered),
+age, sex, and optionally a position on a spatial grid or map. Crucially,
+each agent also has its own decision logic that determines how it behaves
+at each simulation step: whether it moves, how it interacts with
+neighbors, and how its state changes over time~\cite{cdc2025transmission}.
+For example, a healthy agent may be programmed to move away from visibly
+infected neighbors, while an infected agent may remain stationary. The
+parameters governing state transitions can also vary between agents --
+older agents may have a higher probability of infection or a longer
+recovery time, reflecting the heterogeneity observed in real populations.
+
+The agent-based approach is not limited to modeling individual persons.
+The system can also include agents representing elements of the
+environment, such as hospitals that accept infected agents within their
+area and increase their recovery rate, subject to a limited capacity.
+
+The most important distinguishing feature of this approach is that the
+overall epidemic curve is not computed from input parameters using
+equations. Instead, it emerges during the simulation from the sum of
+local interactions between agents. This means that the same model can be
+used to interactively test different scenarios on the simulated
+population -- such as introducing quarantine measures, changing contact
+patterns, or adding vaccination -- and observe how the epidemic dynamics
+change in response. ABMs also make it possible to trace the full chain
+of transmission, identifying which agent infected which, and to detect
+phenomena such as superspreaders that arise naturally from the structure
+of the contact network~\cite{cdc2025transmission}.
+
+However, this flexibility comes at a cost. Agent-based models are more
+computationally demanding than compartmental models, require more data to
+parameterize, and are generally slower to design and
+run~\cite{cdc2025transmission}. For this reason, compartmental models
+remain useful for rapid initial assessments, while ABMs are better suited
+for detailed analysis once sufficient data about the population and
+disease characteristics are available.
+\subsection{Virtual Epidemics in Online Environments}
+\label{sec:wow-epidemic}
+
+\subsubsection{The Corrupted Blood Incident}
+\label{sec:corrupted-blood}
+
+An interesting case related to modeling epidemic dynamics is the so-called "Corrupted Blood" incident observed in the game \cite{lofgren2007virtual}. In this case, a bug introduced a disease-like effect that could spread between players, leading to an uncontrolled epidemic within the virtual environment.
+
+From the perspective of modeling and simulation, this incident is particularly valuable because it revealed emergent behavior that was not explicitly designed by the developers. The spread of the disease depended not only on the mechanics of the system, but also on the actions of individual players, which introduced a level of unpredictability similar to real-world scenarios.
+
+Several phenomena observed during this event resemble real epidemic dynamics. These include rapid spread in densely populated areas, the presence of individuals who acted as "super-spreaders", and attempts by some players to avoid infection by isolating themselves. At the same time, a significant number of players deliberately contributed to the spread, which highlights the importance of behavioral factors in epidemic modeling.
+
+However, as discussed in \cite{lofgren2007virtual}, such virtual environments also exhibit important limitations. In particular, player behavior is influenced by the lack of real-world consequences, such as health risks or economic costs. This leads to actions that would be unlikely in real populations, including intentional exposure to the disease or reckless movement patterns.
+
+From the modeling perspective, this case illustrates a key challenge in simulation of complex systems: accurately capturing human behavior. While classical models such as SIR or SEIR focus primarily on aggregate dynamics, real-world systems are strongly affected by individual decisions and interactions. Therefore, incorporating behavioral aspects into simulation models is crucial for improving their realism and predictive capabilities.
+
+The "Corrupted Blood" incident can thus be treated as an illustrative example showing both the potential and the limitations of using simulated environments for studying epidemic spread.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Place inside the "Epidemic Simulations in Virtual Environments" subsection,
+% after the Corrupted Blood (WoW) part.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Plague Inc.}
+\label{sec:plague-inc}
+
+Plague Inc. is a strategy-simulation mobile game developed by Ndemic
+Creations in 2012, in which the player controls a pathogen with the goal
+of infecting and eliminating the global population. Unlike the Corrupted
+Blood incident discussed above, Plague Inc. was designed intentionally as
+an epidemic simulation, and its mechanics are rooted in epidemiological
+concepts~\cite{cornellPlagueInc2014}.
+
+The game does not implement any specific academic model. According to its
+creator James Vaughan, the core design is based on the concept of the
+basic reproduction number~($R_0$) -- a metric that represents the
+average number of secondary infections caused by a single infected
+individual in a fully susceptible
+population~\cite{gideonR02024}. The central game mechanic revolves
+around the so-called ``Infection Cycle'', which determines how
+individuals become infected and how they transmit the disease to
+others~\cite{cornellPlagueInc2014}.
+
+In practice, the game combines elements of several modeling approaches.
+Populations of individual countries transition through health states
+(healthy, infected, deceased) in a manner similar to compartmental
+models. Global air and sea transport networks create connections between
+countries, reflecting a network-based approach to disease spread.
+Additionally, in-game governments react to the epidemic by closing
+borders and developing a cure, introducing a behavioral component.
+Disease can also be transmitted by animals, and global events such as the
+Olympics create temporary connections between populations of different
+countries, accelerating the spread of the
+pathogen~\cite{cornellPlagueInc2014}. Despite these
+realistic elements, Ndemic Creations has stated that the game is based on
+a scientific understanding of infectious disease spread but should not be
+considered a scientific model~\cite{cornellPlagueInc2014}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\SectionTitleProblemSolution}
+\label{sec:solution}
+
+The research problem addressed in this project is the simulation of
+disease spread in a heterogeneous population. The goal is not only to
+reproduce the general shape of an epidemic curve, but also to represent
+how local contacts, individual behavior, vaccination, hospitals, and
+quarantine-like restrictions influence the dynamics of the epidemic. In
+contrast to purely compartmental models, where the population is
+described only by aggregate variables, the proposed solution uses an
+agent-based model. Each person is represented as an individual agent with
+its own state, age, position, vaccination status, and movement behavior.
+This makes it possible to observe epidemic dynamics that emerge from
+local interactions rather than being directly imposed by differential
+equations.
+
+The model follows the SEIRD structure. Each citizen belongs to one of
+five epidemiological states: susceptible ($S$), exposed ($E$), infected
+($I$), recovered ($R$), or deceased ($D$). Susceptible agents may become
+exposed after contact with infected neighbors. Exposed agents represent
+individuals in the incubation period; after a fixed number of simulation
+steps they become infected. Infected agents may recover, die, or move
+toward a hospital if one is nearby. Recovered agents may either keep
+permanent immunity or lose immunity after a configured number of steps.
+Deceased agents are removed from the spatial grid and no longer
+participate in the simulation.
+
+The simulation is implemented in Python using the Mesa~\cite{mesaDocs2026}
+framework for agent-based modeling. Mesa provides the basic
+abstractions for agents, models, and spatial environments. The
+population is placed on a
+two-dimensional \texttt{MultiGrid}, where multiple agents may occupy the
+same cell. The project uses Python dataclasses to keep the global
+configuration explicit and easy to modify, pandas~\cite{pandasDocs2026}
+to store collected simulation results, and
+Matplotlib~\cite{matplotlibDocs2026} to visualize
+both the final epidemic curve and the live spatial state of the
+simulation. The most important configurable
+parameters are the population size, grid dimensions,
+infection probability, recovery probability, incubation period, mortality
+parameters, hospital capacity, vaccination effectiveness, avoidance
+behavior, immunity duration, quarantine threshold, and number of
+simulation steps.
+
+The system provides two execution modes. The standard script,
+\texttt{run.py}, runs the model for a configured number of steps and then
+plots the aggregated SEIRD curves. The interactive script,
+\texttt{run\_live.py}, displays the grid during the simulation. It shows
+citizens as colored points according to their current epidemiological
+state, marks hospitals and vaccination points with separate symbols, and
+adds a legend with the current state counts. The live mode accepts a
+command-line argument expressed in hundredths of a second; for example,
+\texttt{python run\_live.py 50} updates the displayed frame every half
+second.
+
+\subsection{Model Initialization}
+\label{sec:solution-initialization}
+
+At the beginning of the simulation, the model creates three types of
+objects: citizens, hospitals, and vaccination points. Hospitals and
+vaccination points are placed at fixed positions defined in the
+configuration. Citizens are generated with randomly sampled ages based on
+predefined age brackets and their corresponding probabilities. A
+configured number of citizens is initially assigned to the infected
+state, while the rest start as susceptible. A selected fraction of the
+population is marked as ``avoiders'', meaning that these agents try to
+avoid cells occupied by visibly infected individuals.
+
+The model uses a random seed to make simulation runs reproducible. This
+is important because infection, recovery, death, movement, and age
+sampling all contain stochastic elements. With the same seed and the same
+configuration, the same simulation trajectory can be recreated.
+
+\subsection{Agent Behavior and Movement}
+\label{sec:solution-agent-behavior}
+
+During each simulation step, all agents are activated in random order.
+This random activation avoids a fixed update order and better reflects
+the stochastic nature of the modeled process. Citizen agents first decide
+whether and where to move, and then update their epidemiological state.
+
+Movement is local and takes place on the grid neighborhood of the
+agent's current position. Younger agents move normally, while agents
+above a configured age threshold have a lower probability of moving in a
+given step. This represents reduced mobility among older individuals.
+Avoider agents inspect neighboring cells and prefer destinations without
+infected citizens and outside quarantine zones. If no safe cell is
+available, they fall back to the available neighboring cells. Infected
+agents behave differently: if a hospital is within a configured search
+radius, they move toward the nearest hospital and prefer cells that bring
+them closer to it.
+
+\subsection{Infection Algorithm}
+\label{sec:solution-infection}
+
+The infection process is based on local contacts. For each susceptible
+citizen, the model checks neighboring cells and counts the number of
+infected citizens in the neighborhood. Let $k$ denote the number of
+infected neighbors and let $\beta$ denote the base transmission
+probability per infected contact. The probability that the susceptible
+agent becomes exposed in a given step is computed as:
+
+\begin{equation}
+P(\mathrm{infection}) = 1 - (1 - \beta)^k.
+\end{equation}
+
+This formula assumes that each infected neighbor creates an independent
+chance of transmission. If there are no infected neighbors, the infection
+probability is zero. If the agent is vaccinated, the effective
+transmission probability is reduced according to the vaccination
+effectiveness parameter:
+
+\begin{equation}
+\beta_{\mathrm{vaccinated}} = \beta \cdot (1 - e_v),
+\end{equation}
+
+where $e_v$ is the configured vaccination effectiveness. This means that
+vaccination does not create complete immunity by default, but decreases
+the probability of infection during contact with infected agents.
+
+\subsection{Disease Progression}
+\label{sec:solution-disease-progression}
+
+Disease progression is modeled as a finite-state process. When a
+susceptible citizen becomes infected, the agent first enters the exposed
+state. The exposed state lasts for a fixed incubation period measured in
+simulation steps. After the incubation timer reaches zero, the agent
+becomes infected and can start spreading the disease to others.
+
+In each step, an infected agent may recover with probability $\gamma$.
+This base recovery probability can be increased by a hospital recovery
+bonus if the agent is inside the area of a hospital that still has
+available capacity. The effective recovery probability is therefore:
+
+\begin{equation}
+\gamma_{\mathrm{effective}} =
+\begin{cases}
+\gamma + b_h, & \text{if the agent is inside a non-full hospital area,}\\
+\gamma, & \text{otherwise,}
+\end{cases}
+\end{equation}
+
+where $b_h$ is the configured hospital recovery bonus. For the default
+configuration, $\gamma = 0.05$ and $b_h = 0.05$, so an infected agent in
+range of a hospital with available capacity has a recovery probability
+of $0.10$ in a simulation step instead of $0.05$. If recovery does not
+occur, the model checks whether the agent dies. Mortality is
+age-dependent: all infected agents have a base mortality probability,
+and an additional age-related penalty is added for agents above the
+configured age threshold. This makes older agents more vulnerable, which
+improves the realism of the population model.
+
+Recovered agents receive immunity. If the configured immunity duration is
+zero, immunity is treated as permanent. Otherwise, the immunity timer is
+decreased in each step and the agent eventually returns to the
+susceptible state. This allows the model to represent both permanent and
+temporary immunity scenarios.
+
+\subsection{Environmental Objects and Interventions}
+\label{sec:solution-interventions}
+
+Hospitals and vaccination points are modeled as fixed environmental
+agents. A hospital has a position, area radius, capacity, and recovery
+bonus. During each step, it counts infected citizens within its area. If
+the number of patients does not exceed the capacity, infected citizens in
+the hospital area receive an increased chance of recovery. Once the
+hospital reaches capacity, the recovery bonus is no longer applied.
+
+Vaccination points also have fixed positions. When a susceptible citizen
+enters a cell containing a vaccination point, the citizen becomes
+vaccinated. This vaccination status then reduces the effective infection
+probability in future contacts according to
+$\beta_{\mathrm{vaccinated}} = \beta \cdot (1 - e_v)$, where $e_v$ is
+the vaccination effectiveness. In this model, vaccination is represented
+as a preventive mechanism rather than a treatment for already infected
+agents.
+
+The model also includes a simple quarantine mechanism. If the number of
+infected citizens exceeds a configured threshold, quarantine zones are
+created around positions occupied by infected agents. These zones
+restrict the movement choices of healthy avoider agents and random-moving
+agents. The mechanism is intentionally simple, but it introduces a global
+response to the epidemic and allows the simulation to represent limited
+mobility under epidemic pressure.
+
+\subsection{Live Spatial Visualization}
+\label{sec:solution-live-visualization}
+
+In addition to the final epidemic curve, the project includes a live
+visualization of the spatial simulation. This view is implemented in
+\texttt{run\_live.py} using the interactive plotting mode of
+Matplotlib~\cite{matplotlibDocs2026}. Each frame renders the current grid
+state: susceptible, exposed, infected, recovered, and deceased citizens
+are represented with different colors.
+Vaccinated citizens are additionally marked with an outline, so the
+effect of vaccination points can be observed directly on the grid.
+Hospitals are drawn with a distinct marker and a visible radius of
+influence, while vaccination points are displayed with their own marker.
+The side panel contains a legend and live counters for all SEIRD states,
+the number of vaccinated citizens, and the number of active quarantine
+zones.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{images/live_simulation.png}
+  \caption{Live spatial visualization of the agent-based epidemic
+  simulation. Citizens are displayed on the grid according to their
+  current epidemiological state, while hospitals and vaccination points
+  are marked with separate symbols.}
+  \label{fig:live-simulation}
+\end{figure}
+
+The live visualization is based on snapshots of the model state. A
+snapshot stores the current step number, agent positions, epidemiological
+states, vaccination flags, hospital occupancy, vaccination point
+statistics, and quarantine zones. The graphical interface displays the
+snapshot for step $n$, while the next step, $n+1$, is computed in the
+background by a single-worker \texttt{ThreadPoolExecutor}. This separates
+simulation computation from frame rendering and reduces visible pauses in
+the animation. When the configured delay passes, the already computed
+snapshot is displayed as the next frame.
+
+\subsection{Data Collection and Visualization}
+\label{sec:solution-data-visualization}
+
+The model uses Mesa's \texttt{DataCollector} to record the number of
+agents in each epidemiological state at every simulation step. The
+collected variables are susceptible, exposed, infected, recovered,
+deceased, vaccinated, and the number of active quarantine zones. After
+the simulation ends, the collected data are converted to a pandas
+\texttt{DataFrame}. In the standard execution mode, the epidemic curve is
+visualized using Matplotlib by plotting the SEIRD state counts over time.
+In the live execution mode, the same underlying model is advanced step by
+step, but the current spatial state is rendered continuously before the
+final aggregate plot is needed.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{images/epidemic_curve.png}
+  \caption{Aggregated epidemic curve produced after running the standard
+  simulation. The plot shows the number of susceptible, exposed,
+  infected, recovered, and deceased agents over time.}
+  \label{fig:epidemic-curve}
+\end{figure}
+
+The simulation can stop before reaching the maximum number of steps if no
+infected or exposed agents remain. In that case, the epidemic is treated
+as finished. Otherwise, the model runs until the configured number of
+steps is reached. The resulting plots provide a direct way to analyze how
+the number of susceptible, exposed, infected, recovered, and deceased
+agents changes during the simulated epidemic.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\SectionTitleExperiments}
+\label{sec:experiments}
+
+% the following content of the section should be removed from the final version of the raport.
+
+\emph{Experimental research results with detailed analyses and comments.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\SectionTitleSummary}
+\label{sec:conclusions}
+
+% the following content of the section should be removed from the final version of the raport.
+
+\emph{Summary of the research results, conclusions and plans for further work.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printbibliography
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
