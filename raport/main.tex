@@ -858,9 +858,148 @@ produce clear, measurable changes in the simulated epidemic trajectory.
 \section{\SectionTitleSummary}
 \label{sec:conclusions}
 
-% the following content of the section should be removed from the final version of the raport.
+The objective of this project was to construct and evaluate an
+agent-based simulation of epidemic spread in a heterogeneous population.
+The developed system implements a spatial SEIRD model in which individual
+citizens move on a grid, transmit infection through local contacts, and
+may interact with hospitals, vaccination points, and quarantine
+restrictions. The simulation also supports both aggregate visualization
+of epidemic curves and a live spatial view of agent behavior.
 
-\emph{Summary of the research results, conclusions and plans for further work.}
+The use of an agent-based approach is valuable in comparison with a
+purely compartmental model when the research question concerns individual
+behavior or spatial interventions. A standard SEIR-type model efficiently
+describes changes in population totals, but it does not directly represent
+where individuals are located, which hospital they can reach, whether
+they enter a vaccination point, or how movement decisions modify local
+contacts. In the developed system, these effects emerge from the actions
+of individual agents. Therefore, the model provides a convenient
+experimental framework for studying mechanisms that depend on local
+interaction and heterogeneous behavior.
+
+The experimental study consisted of 110 simulation runs distributed
+across eleven scenarios. The baseline scenario produced an average attack
+rate of 56.8\%, a mean epidemic peak of 44.4 active infections, and 51.8
+deceased citizens. The results confirmed that the model reacts clearly to
+changes in fundamental disease parameters: decreasing the transmission
+probability substantially reduced both the epidemic extent and mortality,
+while increasing it led to a larger outbreak.
+
+The intervention experiments demonstrated that the spatial mechanisms
+implemented in the model can have a measurable impact. A broadly
+distributed and highly effective vaccination programme reduced the attack
+rate from 56.6\% in the no-vaccination scenario to 33.6\%. Expanded
+hospital coverage was particularly effective in the simulation, reducing
+the average number of deceased citizens from 71.5 without hospital
+support to 26.1. Early quarantine activation also strongly limited the
+epidemic, reducing the attack rate from 56.8\% to 27.1\%. At the same
+time, the experiments revealed that the default quarantine threshold was
+too high: quarantine was never activated in baseline runs and thus had no
+effect unless its threshold was changed.
+
+\subsection{Conclusions from the Experiments}
+\label{sec:conclusions-experiments}
+
+The transmission experiment provides a useful reference for interpreting
+the intervention scenarios. When the probability of transmission per
+contact was reduced, the number of citizens exposed to the epidemic
+decreased considerably: the attack rate fell from 56.8\% in the
+baseline to 32.8\%, and the number of deaths fell from 51.8 to 29.5.
+When transmission was increased, both values grew. This confirms that
+the simulation follows the expected epidemic principle: reducing the
+probability of successful transmission limits not only the number of
+active infections but also the final health burden.
+
+The hospital experiment yielded one of the clearest results. In this
+model, a hospital does not prevent a susceptible citizen from becoming
+infected; instead, it increases the recovery probability of an already
+infected citizen located in its area. Nevertheless, this indirect
+mechanism also influences the epidemic curve, because citizens who
+recover sooner spend fewer steps in the infectious state. The scenario
+without hospital support produced 71.5 deaths on average, whereas the
+expanded hospital scenario produced 26.1 deaths, a reduction of 45.4
+deaths, or approximately 63.5\%. The attack rate also fell from 66.5\%
+to 37.2\%. Thus, within the simulated environment, accessible medical
+care improves individual outcomes and indirectly reduces further
+transmission by shortening infectious episodes.
+
+The vaccination results show that effectiveness alone is not sufficient:
+the intervention must also reach a meaningful fraction of the
+population. With only the two default vaccination points, 24.3 citizens
+were vaccinated on average and the result was nearly identical to the
+scenario without vaccination. In contrast, the expanded programme
+vaccinated 174.7 citizens on average and reduced the attack rate by
+23.08 percentage points compared with no vaccination points. It also
+reduced the mean number of deaths from 52.6 to 29.0. The conclusion is
+that spatial accessibility is essential in this model: even an effective
+vaccine has little population-level impact if agents rarely encounter a
+vaccination point.
+
+The quarantine experiment led to a similar practical conclusion. The
+baseline configuration contained a quarantine mechanism, but its
+activation threshold of 100 active infections was never reached.
+Consequently, simply declaring that quarantine exists in the model does
+not imply that it affects a simulation run. When the threshold was
+lowered to 20, quarantine became active in every repetition and reduced
+the attack rate from 56.8\% to 27.1\%, while deaths decreased from 51.8
+to 23.7. This result indicates that the timing of an intervention is as
+important as its presence: an intervention activated only after the
+outbreak has already exceeded its typical scale cannot change the
+baseline outcome.
+
+The population in the model is heterogeneous with respect to age. Age
+already influences the simulated outcomes in two ways: citizens above
+the mobility threshold move less frequently, and mortality increases for
+every year above the configured age threshold. Therefore, an older
+population would be expected to be particularly sensitive to hospital
+availability and epidemic prevention. However, the experimental series
+reported in this work kept the age distribution constant across all
+scenarios. The study therefore does not provide a measured comparison
+between younger and older populations. A dedicated future experiment
+should vary the age-bracket weights and compare mortality, hospital load,
+and intervention effectiveness under aging-population scenarios.
+
+An important conclusion is that the presence of a mechanism in the model
+does not guarantee that it influences the results. The two default
+vaccination points reached too few citizens to produce a substantial
+difference from a scenario without vaccination. Similarly, the default
+quarantine setting remained inactive. Scenario analysis was therefore
+necessary not only to evaluate possible interventions, but also to verify
+whether their configured parameters made them relevant in practice.
+
+The behavioral experiment also highlighted a limitation of the current
+implementation. Increasing the fraction of agents that avoided visibly
+infected neighbors did not reduce the epidemic; in the tested setting it
+produced a worse outcome than no avoidance behavior. This should be
+understood as a property of the simplified movement algorithm rather than
+as a conclusion about real human behavior. It indicates that behavioral
+rules require careful calibration and validation before being used for
+substantive interpretation.
+
+The presented system should therefore be regarded as a functional
+simulation and experimentation framework rather than a predictive model
+of a specific real epidemic. Its advantages are transparency,
+configurability, reproducibility through controlled seeds, and the
+ability to visualize how aggregate curves emerge from local interactions.
+Its limitations include simplified mobility, simplified hospital and
+vaccination access, the absence of calibration against empirical data,
+and a limited number of repetitions in the experimental study.
+
+Further work could extend the model by adding more realistic contact
+structures, such as households, schools, and workplaces; vaccination
+strategies based on age or risk; explicit hospital admissions and
+capacity queues; improved quarantine and isolation rules; and statistical
+analysis over a larger number of simulation repetitions. It would also
+be useful to refine the behavioral movement mechanism and test it against
+well-defined expectations before drawing conclusions from avoidance-based
+interventions.
+
+In conclusion, the project shows that an agent-based model is a useful
+tool for exploring epidemic dynamics when local interactions and
+interventions matter. Although simplified, the implemented simulation
+successfully supports controlled experiments and makes the effects of
+transmission, vaccination, hospital coverage, and quarantine visible both
+numerically and spatially.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \printbibliography
