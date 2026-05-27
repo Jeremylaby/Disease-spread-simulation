@@ -68,7 +68,7 @@ class BehaviorConfig:
 @dataclass
 class QuarantineConfig:
     # Infection count that triggers quarantine zone activation
-    threshold: int = 50
+    threshold: int = 100
     # Radius of restricted zone in grid cells
     zone_radius: int = 5
 
@@ -83,7 +83,7 @@ class SimulationConfig:
     behavior: BehaviorConfig = field(default_factory=BehaviorConfig)
     quarantine: QuarantineConfig = field(default_factory=QuarantineConfig)
 
-    num_steps: int = 200
+    num_steps: int = 1_000
     seed: int = 42
 
 
