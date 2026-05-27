@@ -651,9 +651,207 @@ agents changes during the simulated epidemic.
 \section{\SectionTitleExperiments}
 \label{sec:experiments}
 
-% the following content of the section should be removed from the final version of the raport.
+\subsection{Experimental Protocol}
+\label{sec:experiments-protocol}
 
-\emph{Experimental research results with detailed analyses and comments.}
+The purpose of the experiments was to determine how selected disease
+parameters and intervention mechanisms influence the epidemic curve. The
+experiments were performed without the live visualization, using the same
+agent-based simulation model described in Section~\ref{sec:solution}. The
+baseline scenario used a population of 500 citizens on a $50 \times 50$
+grid, with five initially infected agents, $\beta = 0.30$,
+$\gamma = 0.05$, permanent post-recovery immunity, one hospital, and two
+vaccination points.
+
+Eleven scenarios were tested: the baseline configuration and ten modified
+configurations grouped into transmission, vaccination, hospital,
+behavioral, and quarantine experiments. Each scenario was simulated ten
+times, with seeds from 1000 to 1009. The same set of seeds was used for
+each scenario in order to limit the influence of stochastic variability
+on comparisons. The maximum simulation horizon was 1000 steps; however,
+all 110 runs ended earlier because no exposed or infected agents
+remained.
+
+The simulation state was saved after every step. In total, the
+experiments generated 25,827 step-level observations. A validation of the
+saved results confirmed that the sum of susceptible, exposed, infected,
+recovered, and deceased citizens remained equal to 500 in every recorded
+state. The complete raw data, summaries, and generated plots are stored
+in \path{chapter_3/results/chapter3_full_10_replicates}.
+
+The following measures were used in the analysis:
+\begin{itemize}
+\item \textbf{peak infected} -- the largest number of simultaneously
+  infected citizens during a run,
+\item \textbf{attack rate} -- the percentage of the initial population
+  that became infected at any point in a run,
+\item \textbf{final deceased} -- the number of deceased citizens at the
+  end of a run,
+\item \textbf{duration} -- the step at which no exposed or infected
+  citizens remained.
+\end{itemize}
+
+\subsection{Aggregated Results}
+\label{sec:experiments-aggregated}
+
+Table~\ref{tab:scenario-results} presents the mean values calculated
+over ten repetitions of each scenario. The baseline epidemic reached a
+mean peak of 44.4 simultaneously infected citizens. On average, 56.8\%
+of the population became infected and 51.8 citizens died before the
+epidemic ended.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Mean results of experimental scenarios over ten repetitions.}
+  \label{tab:scenario-results}
+  \small
+  \begin{tabularx}{\textwidth}{@{}Xrrrr@{}}
+    \toprule
+    Scenario & Peak $I$ & Attack rate [\%] & Deceased & Duration \\
+    \midrule
+    Baseline                         & 44.4 & 56.8 & 51.8 & 237.9 \\
+    Lower transmission               & 28.0 & 32.8 & 29.5 & 253.9 \\
+    Higher transmission              & 63.2 & 66.8 & 60.2 & 210.5 \\
+    No vaccination points            & 47.6 & 56.6 & 52.6 & 248.8 \\
+    Expanded vaccination programme   & 34.2 & 33.6 & 29.0 & 202.2 \\
+    No hospital support              & 50.2 & 66.5 & 71.5 & 282.9 \\
+    Expanded hospital coverage       & 26.6 & 37.2 & 26.1 & 182.4 \\
+    No avoidance behavior            & 39.3 & 47.4 & 41.1 & 249.3 \\
+    High avoidance behavior          & 45.7 & 59.0 & 52.5 & 266.0 \\
+    Quarantine disabled              & 44.4 & 56.8 & 51.8 & 237.9 \\
+    Early quarantine activation      & 31.3 & 27.1 & 23.7 & 199.9 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Transmission Probability}
+\label{sec:experiments-transmission}
+
+Changing the transmission probability produced the expected change in
+the epidemic scale. Reducing $\beta$ from 0.30 to 0.15 decreased the
+mean peak number of infected citizens from 44.4 to 28.0 and decreased
+the attack rate by 24.04 percentage points relative to the baseline.
+The mean number of deceased citizens fell from 51.8 to 29.5. Increasing
+$\beta$ to 0.50 resulted in a peak of 63.2 infected citizens, an attack
+rate of 66.8\%, and 60.2 deceased citizens on average. Thus, within
+this model, transmission probability is a strong determinant of both
+epidemic magnitude and mortality.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{images/chapter3_transmission_comparison.png}
+  \caption{Mean number of active infections for transmission probability
+  scenarios. Each curve is averaged over ten repetitions.}
+  \label{fig:chapter3-transmission}
+\end{figure}
+
+\subsection{Vaccination Experiment}
+\label{sec:experiments-vaccination}
+
+Removing the two default vaccination points changed the baseline outcome
+only slightly: the attack rate was 56.6\%, compared with 56.8\% in the
+baseline scenario. This result is consistent with the small number of
+agents vaccinated in the baseline, equal to 24.3 on average. The two
+default points therefore provide limited coverage in a population of
+500 moving agents.
+
+The expanded vaccination programme used 17 distributed vaccination
+points and increased vaccine effectiveness from 0.70 to 0.90. In this
+scenario, 174.7 citizens were vaccinated on average. Compared with the
+scenario without vaccination points, the mean peak decreased by 13.4
+citizens, the attack rate decreased by 23.08 percentage points, and the
+mean number of deceased citizens decreased from 52.6 to 29.0. This
+experiment indicates that, in the implemented spatial model,
+vaccination becomes influential when access to vaccination points is
+sufficiently broad.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{images/chapter3_vaccination_comparison.png}
+  \caption{Mean number of active infections in the vaccination scenarios.}
+  \label{fig:chapter3-vaccination}
+\end{figure}
+
+\subsection{Hospital Experiment}
+\label{sec:experiments-hospital}
+
+Hospital coverage produced a substantial difference in health outcomes.
+Without hospital support, the simulation produced 71.5 deceased citizens
+and an attack rate of 66.5\% on average. Expanded hospital coverage,
+consisting of three hospitals with a larger treatment radius and a
+higher recovery bonus, reduced the mean number of deceased citizens to
+26.1. Relative to the no-hospital scenario, this corresponds to 45.4
+fewer deaths on average. The peak number of infected citizens also fell
+from 50.2 to 26.6.
+
+The observed effect is consistent with the implemented recovery
+mechanism: infected citizens inside a non-full hospital area receive an
+increased recovery probability. However, hospital placement also affects
+movement, because infected citizens move towards nearby hospitals.
+Consequently, this experiment evaluates the combined effect of improved
+treatment coverage and hospital-seeking movement rather than the
+recovery bonus in isolation.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{images/chapter3_hospital_comparison.png}
+  \caption{Mean number of active infections in the hospital coverage
+  scenarios.}
+  \label{fig:chapter3-hospital}
+\end{figure}
+
+\subsection{Quarantine Experiment}
+\label{sec:experiments-quarantine}
+
+In the baseline configuration, quarantine is activated only when at
+least 100 citizens are actively infected. Since no baseline run reached
+this threshold, quarantine was never activated. As a result, the
+baseline and the explicitly disabled-quarantine scenario produced
+identical results for every seed.
+
+After decreasing the activation threshold to 20 infected citizens,
+quarantine was activated in all ten runs, for 32.1 steps on average. The
+mean peak number of infected citizens fell from 44.4 to 31.3, while the
+attack rate fell from 56.8\% to 27.1\%. The mean number of deaths fell
+from 51.8 to 23.7. The experiment therefore shows that the quarantine
+mechanism can influence the epidemic, but the default threshold is too
+high for it to become active in the baseline scenario.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{images/chapter3_quarantine_comparison.png}
+  \caption{Mean number of active infections in the quarantine scenarios.
+  The baseline curve overlaps the curve for disabled quarantine.}
+  \label{fig:chapter3-quarantine}
+\end{figure}
+
+\subsection{Avoidance Behavior and Interpretation Limits}
+\label{sec:experiments-behavior}
+
+The avoidance experiment produced a non-intuitive result. The scenario
+with no avoidance behavior produced an attack rate of 47.4\%, while a
+scenario in which 80\% of agents avoided visibly infected neighbors
+produced an attack rate of 59.0\%. The high-avoidance scenario also
+resulted in a slightly higher peak and more deaths than the baseline.
+
+This observation should not be interpreted as a general claim that
+avoidance increases epidemic spread. In the implemented model, avoiders
+select a neighboring cell that does not currently contain a visibly
+infected citizen. They do not avoid exposed citizens, and their movement
+may lead several susceptible agents into similar locally safe cells.
+Additionally, agents are activated sequentially in random order. The
+result is therefore an emergent property of this specific movement rule
+and indicates that the behavioral component should be refined and tested
+further before drawing epidemiological conclusions.
+
+More broadly, these experiments are descriptive simulation results rather
+than statistical evidence for real-world intervention effectiveness. They
+are based on ten stochastic repetitions of a simplified spatial model.
+Nevertheless, they show that the developed framework correctly supports
+controlled scenario analysis and that several implemented interventions
+produce clear, measurable changes in the simulated epidemic trajectory.
+
+\clearpage
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
